@@ -1,0 +1,191 @@
+use Mumbai;
+
+Q.1]
+
+create table DEPT
+(
+DEPTNO int(2),
+DNAME varchar(15),
+LOC varchar(10)
+);
+
+insert into DEPT(DEPTNO, DNAME, LOC) values
+(10,'ACCOUNTING','NEW YORK'),
+(20,'RESEARCH','DALLAS'),
+(30,'SALES','CHICAGO'),
+(40,'OPERATIONS','BOSTON');
+
+Q.2]
+
+create table EMP (
+EMPNO int(4),
+ENAME varchar(10),
+JOB varchar(9),
+HIREDATE date,
+SAL float(7,2),
+COMM float(7,2),
+DEPTNO int(2)
+);
+
+insert into EMP (EMPNO, ENAME, JOB, HIREDATE, SAL, COMM, DEPTNO) values
+(7839, 'KING', 'MANAGER', '1991-11-17', 5000, NULL, 10),
+(7698, 'BLAKE', 'CLERK', '1981-05-01', 2850, NULL, 30),
+(7782, 'CLARK', 'MANAGER', '1981-06-09', 2450, NULL, 10),
+(7566, 'JONES', 'CLERK', '1981-04-02', 2975, NULL, 20),
+(7654, 'MARTIN', 'SALESMAN', '1981-09-28', 1250, 1400, 30),
+(7499, 'ALLEN', 'SALESMAN', '1981-02-20', 1600, 300, 30);
+
+
+Q.3] 
+select ENAME from EMP where SAL between 2500 and 5000;
+
+ENAME
+----------
+KING
+BLAKE
+JONES
+
+Q.4]
+select ENAME from EMP order by ENAME desc;
+
+ENAME
+----------
+MARTIN
+KING
+JONES
+CLARK
+BLAKE
+ALLEN
+
+
+Q.5] 
+select lower(JOB) from EMP;
+
+lower(JOB)
+---------------
+manager
+clerk
+manager
+clerk
+salesman
+salesman
+
+Q.6] 
+select ENAME, length(ENAME) from EMP;
+
+ENAME    length(ENAME)
+--------------------------------
+KING	4
+BLAKE	5
+CLARK	5
+JONES	5
+MARTIN	6
+ALLEN	5
+
+
+Q.7]
+select DEPT.DEPTNO, count(ENAME) FROM DEPT, EMP where DEPT.DEPTNO = EMP.DEPTNO group by DEPTNO order by 1;
+
+DEPTNO  count(ENAME)
+--------------------------------
+10	2
+20	1
+30	3
+
+Q.8] 
+select DNAME, ENAME from DEPT, EMP where DEPT.DEPTNO = EMP.DEPTNO;
+
+DNAME                         ENAME
+-------------------------------------------
+ACCOUNTING	KING
+SALES	                BLAKE
+ACCOUNTING	CLARK
+RESEARCH	JONES
+SALES	                 MARTIN
+SALES	                  ALLEN
+
+Q.9]
+select instr(ENAME,'AR') from EMP;
+
+instr(ENAME,'AR')
+--------------------------
+0
+0
+3
+0
+2
+0
+
+Q.10]
+select ENAME, 0.20*SAL as "HRA" from EMP;
+
+ENAME      HRA
+---------------------------
+KING	1000.00
+BLAKE	570.00
+CLARK	490.00
+JONES	595.00
+MARTIN	250.00
+ALLEN	320.00
+
+
+SECTION - II
+
+Q.1] 
+
+create table temp (Output varchar(30));
+
+delimiter \\
+create procedure PROC1 (s1 varchar(15), s2 varchar(15))
+begin
+if instr(s2,s1)>0
+	then insert into temp values ('string1 exists inside string2');
+else
+	 insert into temp values ('String not exist');
+end if;
+end; //
+delimiter ;
+
+call PROC1 ('DAC','CDAC');
+select * from temp;
+
+
+Output
+----------
+string1 exists inside string2
+
+
+Q.2]
+delimiter \\
+create function FUNC1 ( a int, b int, c int)
+returns boolean
+deterministic
+begin
+	if a+b > c then
+		if b+c > a then
+			if a+c > b then
+            return TRUE;
+            end if;
+		end if;
+	else
+		return FALSE;
+	end if;
+end; //
+delimiter ;
+
+delimiter //
+create procedure triangle()
+begin
+declare res boolean;
+set res = FUNC1 (14,20,33);
+insert into temp values (res);
+end; //
+delimiter ;
+
+call triangle();
+select * from temp;
+
+
+Output
+----------
+1
